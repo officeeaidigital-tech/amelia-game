@@ -1,0 +1,17 @@
+{
+  "name": "המשחק של אמיליה",
+  "short_name": "אמיליה",
+  "description": "משחק מספרים, אותיות וצלילים לילדים בני 5",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#E5F5F1",
+  "theme_color": "#2EC4B6",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
