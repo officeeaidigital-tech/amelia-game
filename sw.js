@@ -1,5 +1,5 @@
 // Keeps the game on the device so it opens without internet.
-const CACHE = 'amelia-game-v1';
+const CACHE = 'amelia-game-v4';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {

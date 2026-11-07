@@ -95,9 +95,9 @@ button:focus-visible { outline: 4px solid var(--grape); outline-offset: 4px; }
 .home-top { display: flex; justify-content: flex-end; }
 .parent-btn { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--soft); padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.6); }
 .parent-btn svg { width: 16px; height: 16px; }
-.hero { display: flex; align-items: center; justify-content: center; gap: 22px; flex-wrap: wrap; }
-.hero .buddy-box { width: clamp(140px, 32vw, 210px); cursor: pointer; }
-.hero .bubble { max-width: 420px; }
+.hero { display: flex; align-items: center; justify-content: center; gap: 22px; }
+.hero .buddy-box { width: clamp(96px, 24vw, 190px); flex: none; cursor: pointer; }
+.hero .bubble { max-width: 420px; flex: 1; min-width: 0; }
 .title { font-family: var(--display); font-weight: 700; font-size: clamp(30px, 7vw, 46px); text-align: center; margin: 0; letter-spacing: .5px; }
 .choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 28px; margin-top: auto; margin-bottom: auto; }
 .choice {
@@ -122,6 +122,77 @@ button:focus-visible { outline: 4px solid var(--grape); outline-offset: 4px; }
 .opt.claps { font-size: clamp(26px, 6.5vw, 40px); line-height: 1.15; white-space: normal; }
 button.big-pic { background: none; cursor: pointer; }
 .big-pic.clap { animation: chomp .25s ease-in-out; }
+.choice.wide { grid-column: 1 / -1; flex-direction: row; gap: 22px; min-height: clamp(96px, 14vh, 140px); }
+.choice.wide .choice-label { color: #fff; font-size: clamp(26px, 6vw, 36px); }
+
+/* letter map */
+.map-title { flex: 1; margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(22px, 5.4vw, 32px); text-align: center; }
+.map-wrap { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 6px 16px; }
+.map-grid { position: relative; display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: 18px 14px; max-width: 760px; margin: 0 auto; }
+.map-path { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.stone {
+  position: relative; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; max-width: 120px; width: 100%; justify-self: center;
+  font-family: var(--display); font-weight: 700; font-size: clamp(32px, 8.5vw, 56px); line-height: 1; transition: transform .1s;
+}
+.stone:active { transform: translateY(4px); }
+.stone.learned { background: var(--sc); color: #fff; box-shadow: 0 6px 0 var(--scd); text-shadow: 0 2px 0 rgba(0, 0, 0, .15); }
+.stone.todo { background: #F4F0FF; color: transparent; -webkit-text-stroke: 2px var(--grape-dk); box-shadow: 0 6px 0 #DDD3F7; }
+.stone.next { background: #FFFFFF; color: var(--ink); box-shadow: 0 0 0 6px var(--sun), 0 8px 0 6px var(--sun-dk); animation: nextStone 1.6s ease-in-out infinite; z-index: 1; }
+.stone.just { animation: pop .6s cubic-bezier(.3, 1.7, .5, 1); }
+.stone-star { position: absolute; top: -8px; left: -8px; width: 34px; }
+.stone-star .st { fill: var(--sun); stroke: var(--sun-dk); }
+.sticker {
+  width: clamp(120px, 30vw, 170px); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+  background: var(--sc); color: #fff; font-family: var(--display); font-weight: 700; font-size: clamp(72px, 18vw, 110px);
+  box-shadow: 0 8px 0 var(--grape-dk), 0 0 0 8px #fff; animation: pop .6s cubic-bezier(.3, 1.7, .5, 1);
+}
+.end-btns { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+.end-hub { font-family: var(--display); font-weight: 700; font-size: 60px; color: var(--ink); }
+
+/* letter hub and its tasks */
+.hub-letter { flex: 1; text-align: center; font-family: var(--display); font-weight: 700; font-size: clamp(56px, 14vw, 84px); line-height: 1; color: var(--ink); text-shadow: 4px 4px 0 var(--pink); }
+.hub-tiles { margin-top: 0; }
+.hub-tiles .choice { position: relative; }
+.hub-tiles .choice-art { font-size: clamp(44px, 11vw, 70px); }
+.hub-tiles .choice.wide .choice-label { color: var(--ink); }
+.done-check { position: absolute; top: -10px; left: -10px; width: 44px; height: 44px; border-radius: 50%; background: var(--go); box-shadow: 0 3px 0 var(--go-dk); display: grid; place-items: center; animation: pop .5s cubic-bezier(.3, 1.7, .5, 1); }
+.done-check svg { width: 26px; height: 26px; }
+.shadow-letter { font-family: var(--display); font-weight: 700; font-size: clamp(150px, 38vw, 240px); line-height: 1; color: #3A4660; opacity: .88; filter: blur(.6px); }
+.target-chip { font-family: var(--display); font-weight: 700; font-size: 44px; line-height: 1; padding: 6px 22px; border-radius: 999px; background: #FFF4D1; box-shadow: 0 4px 0 var(--sun); }
+.bubbles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; width: min(100%, 380px); }
+.bub {
+  aspect-ratio: 1; border-radius: 50%; font-family: var(--display); font-weight: 700; font-size: clamp(40px, 10vw, 58px); line-height: 1; color: var(--ink);
+  background: radial-gradient(circle at 35% 30%, #FFFFFF 0 14%, var(--bc) 15% 100%); box-shadow: inset 0 -6px 0 rgba(32, 48, 71, .12), 0 5px 0 #DCE7EC;
+  animation: floaty 3s ease-in-out infinite; animation-delay: var(--d, 0s);
+}
+.bub.popped { animation: popOut .35s ease-in forwards; pointer-events: none; }
+.bub.wobble { animation: wobble .5s ease-in-out; }
+.bub.hint { box-shadow: 0 0 0 8px var(--sun), 0 5px 0 #DCE7EC; }
+.opt.thumb { font-size: clamp(54px, 13vw, 80px); }
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes popOut { 0% { transform: scale(1); opacity: 1; } 60% { transform: scale(1.35); opacity: .6; } 100% { transform: scale(1.6); opacity: 0; visibility: hidden; } }
+.meet { display: flex; align-items: center; justify-content: center; gap: clamp(16px, 6vw, 48px); flex-wrap: wrap; }
+.meet-letter { background: none; font-size: clamp(130px, 32vw, 210px); animation: pop .6s cubic-bezier(.3, 1.7, .5, 1); cursor: pointer; }
+.opt.go-next { min-height: 96px; }
+.opt.go-next svg { width: 60px; height: 60px; }
+.order { border: 2px solid #E3EDF2; border-radius: 14px; padding: 10px 12px; gap: 8px; }
+.order legend { padding: 0 6px; color: var(--soft); }
+.order .check { align-items: flex-start; line-height: 1.4; }
+.order .check input { flex: none; margin-top: 2px; }
+.reset-btn { align-self: flex-start; color: var(--soft); text-decoration: underline; padding: 4px 0; font-size: 15px; }
+@keyframes nextStone { 0%, 100% { transform: scale(1.06); } 50% { transform: scale(1.16); } }
+
+/* writing pad */
+.draw-wrap { position: relative; flex: 1; width: 100%; min-height: 0; display: grid; place-items: center; }
+.pad { position: relative; touch-action: none; border-radius: 26px; background: #FBFDFE; box-shadow: inset 0 0 0 3px #E3EDF2; }
+.pad canvas { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 26px; }
+.pad .ink { cursor: crosshair; touch-action: none; }
+.draw-pic { position: absolute; top: 4px; left: 4px; font-size: clamp(40px, 10vw, 64px); line-height: 1; pointer-events: none; transition: transform .4s cubic-bezier(.3, 1.7, .5, 1); }
+.draw-pic.won { transform: scale(1.6) translate(14px, 14px); }
+.options.single { grid-template-columns: minmax(0, 300px); justify-content: center; }
+.opt.eraser { display: flex; min-height: 88px; align-items: center; justify-content: center; gap: 14px; font-size: clamp(26px, 6vw, 34px); font-weight: 600; }
+.opt.eraser svg { width: 48px; height: 48px; }
+.eraser.hint { animation: glow 1.1s ease-in-out infinite; }
 .choice-label { font-family: var(--display); font-weight: 600; font-size: clamp(22px, 5vw, 30px); }
 
 /* game */
@@ -261,6 +332,11 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
         <span class="choice-pic" aria-hidden="true">🍪🍪🍪</span>
         <span class="choice-label">חֶשְׁבּוֹן</span>
       </button>
+      <button type="button" class="choice press wide" data-game="writing" style="--c: var(--grape); --cd: var(--grape-dk)" aria-label="כותבים">
+        <span class="choice-art" aria-hidden="true">✏️</span>
+        <span class="choice-label">כּוֹתְבִים</span>
+        <span class="choice-art" aria-hidden="true" style="color:#fff">א</span>
+      </button>
     </div>
   </section>
 
@@ -286,9 +362,49 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
     <div class="buddy-box" id="endBuddy"></div>
     <div class="end-stars" id="endStars"></div>
     <div class="bubble" id="endBubble"></div>
-    <button id="endHome" class="home-big press" type="button" aria-label="בית" style="--c: var(--sky); --cd: var(--sky-dk)">
-      <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V20h4.5v-5h3v5H18v-9.5" fill="#fff"/></svg>
-    </button>
+    <div class="end-btns">
+      <button id="endHub" class="home-big press end-hub" type="button" aria-label="חזרה לאות" style="--c: var(--sun); --cd: var(--sun-dk)" hidden></button>
+      <button id="endMap" class="home-big press" type="button" aria-label="למסלול האותיות" style="--c: var(--grape); --cd: var(--grape-dk)" hidden>
+        <svg viewBox="0 0 48 48"><circle cx="12" cy="36" r="6" fill="#fff"/><circle cx="36" cy="12" r="6" fill="#fff"/><path d="M12 30C12 18 36 30 36 18" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="2 6" stroke-linecap="round"/></svg>
+      </button>
+      <button id="endHome" class="home-big press" type="button" aria-label="בית" style="--c: var(--sky); --cd: var(--sky-dk)">
+        <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V20h4.5v-5h3v5H18v-9.5" fill="#fff"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <section id="hub" class="screen" hidden>
+    <header class="bar">
+      <button id="hubHome" class="round-btn press" type="button" aria-label="בית" style="--c: var(--sky); --cd: var(--sky-dk)">
+        <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V20h4.5v-5h3v5H18v-9.5" fill="#fff"/></svg>
+      </button>
+      <div class="hub-letter" id="hubLetter"></div>
+      <button id="hubMap" class="round-btn press" type="button" aria-label="למסלול האותיות" style="--c: var(--grape); --cd: var(--grape-dk)">
+        <svg viewBox="0 0 48 48"><circle cx="12" cy="36" r="6" fill="#fff"/><circle cx="36" cy="12" r="6" fill="#fff"/><path d="M12 30C12 18 36 30 36 18" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="2 6" stroke-linecap="round"/></svg>
+      </button>
+    </header>
+    <div class="talk">
+      <div class="buddy-box" id="hubBuddy"></div>
+      <div class="bubble" id="hubBubble"></div>
+    </div>
+    <div class="choices hub-tiles" id="hubTiles"></div>
+  </section>
+
+  <section id="map" class="screen" hidden>
+    <header class="bar">
+      <button id="mapHome" class="round-btn press" type="button" aria-label="בית" style="--c: var(--sky); --cd: var(--sky-dk)">
+        <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10.5V20h4.5v-5h3v5H18v-9.5" fill="#fff"/></svg>
+      </button>
+      <h2 class="map-title">מַסְלוּל הָאוֹתִיּוֹת</h2>
+      <button id="reviewBtn" class="round-btn press" type="button" aria-label="משחק חזרה על האותיות שלמדתי" style="--c: var(--grape); --cd: var(--grape-dk)" hidden>
+        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="#fff"/><circle cx="9" cy="9" r="1.6" fill="#7650E0"/><circle cx="15" cy="15" r="1.6" fill="#7650E0"/><circle cx="15" cy="9" r="1.6" fill="#7650E0"/><circle cx="9" cy="15" r="1.6" fill="#7650E0"/></svg>
+      </button>
+    </header>
+    <div class="talk">
+      <div class="buddy-box" id="mapBuddy"></div>
+      <div class="bubble" id="mapBubble"></div>
+    </div>
+    <div class="map-wrap"><div class="map-grid" id="mapGrid"></div></div>
   </section>
 
   <div id="gate" class="overlay" hidden>
@@ -305,6 +421,12 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
         <input type="text" id="childName" maxlength="20" autocomplete="off">
       </div>
       <label class="check"><input type="checkbox" id="voiceOn" checked> הקראה בקול</label>
+      <fieldset class="field order">
+        <legend>סדר האותיות במסלול (אפשר תמיד לבחור כל אות)</legend>
+        <label class="check"><input type="radio" name="order" id="orderAbc" checked> לפי האלף־בית, מ־א עד ת</label>
+        <label class="check"><input type="radio" name="order" id="orderRec"> סדר מומלץ לגן: אותיות השם קודם, ואותיות דומות לא אחת אחרי השנייה</label>
+      </fieldset>
+      <button type="button" class="reset-btn" id="resetProgress">איפוס התקדמות</button>
       <p id="voiceStatus"></p>
       <p>כל סבב הוא 8 שאלות, בערך 5 דקות. מומלץ סבב אחד או שניים ביום.</p>
       <button type="button" class="close press" id="settingsClose" style="--c: var(--go); --cd: var(--go-dk)">שמירה</button>
@@ -337,10 +459,24 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
     'נ': { n: 'נוּן', w: [['נָחָשׁ', '🐍'], ['נֵר', '🕯️'], ['נְמָלָה', '🐜']] },
     'ס': { n: 'סָמֶךְ', w: [['סוּס', '🐴'], ['סֵפֶר', '📖'], ['סַבּוֹן', '🧼']] },
     'ד': { n: 'דָּלֶת', w: [['דָּג', '🐟'], ['דֻּבִּי', '🧸'], ['דְּבוֹרָה', '🐝']] },
-    'ג': { n: 'גִּימֶל', w: [['גְּלִידָה', '🍦'], ['גֶּזֶר', '🥕'], ['גִּיטָרָה', '🎸']] }
+    'ג': { n: 'גִּימֶל', w: [['גְּלִידָה', '🍦'], ['גֶּזֶר', '🥕'], ['גִּיטָרָה', '🎸']] },
+    'ה': { n: 'הֵא', w: [['הַר', '⛰️'], ['הֶלִיקוֹפְּטֶר', '🚁'], ['הִיפּוֹפּוֹטָם', '🦛']] },
+    'ו': { n: 'וָו', w: [['וֶרֶד', '🌹'], ['וַפֶל', '🧇']] },
+    'ז': { n: 'זַיִן', w: [['זֶבְּרָה', '🦓'], ['זַיִת', '🫒'], ['זְבוּב', '🪰']] },
+    'ח': { n: 'חֵית', w: [['חָתוּל', '🐱'], ['חָלָב', '🥛'], ['חַלּוֹן', '🪟']] },
+    'ט': { n: 'טֵית', w: [['טֶלֶפוֹן', '📱'], ['טַוָּס', '🦚'], ['טִיל', '🚀']] },
+    'י': { n: 'יוֹד', w: [['יָד', '✋'], ['יָרֵחַ', '🌙'], ['יַלְדָּה', '👧']] },
+    'כ': { n: 'כַּף', w: [['כֶּלֶב', '🐶'], ['כַּדּוּר', '⚽'], ['כּוֹבַע', '🎩']] },
+    'ע': { n: 'עַיִן', w: [['עֵץ', '🌳'], ['עוּגָה', '🎂'], ['עַכְבָּר', '🐭']] },
+    'פ': { n: 'פֵּא', w: [['פִּיל', '🐘'], ['פֶּרַח', '🌸'], ['פִּיצָה', '🍕']] },
+    'צ': { n: 'צָדִי', w: [['צָב', '🐢'], ['צְפַרְדֵּעַ', '🐸'], ['צִפּוֹר', '🐦']] },
+    'ק': { n: 'קוֹף', w: [['קוֹף', '🐒'], ['קַקְטוּס', '🌵'], ['קֶשֶׁת', '🌈']] }
   };
+  // The first letters for quiz games until she has learned four of her own.
+  const STARTER = ['מ', 'ל', 'א', 'ש', 'ת', 'ר', 'ב', 'נ', 'ס', 'ד', 'ג'];
   // Letters that look or sound alike never appear together as choices.
-  const CONF = [['ד', 'ר'], ['ג', 'נ'], ['ב', 'כ'], ['ס', 'ם'], ['ת', 'ה'], ['ת', 'ח'], ['מ', 'ט']];
+  const CONF = [['ד', 'ר'], ['ג', 'נ'], ['ב', 'כ'], ['ס', 'ם'], ['ת', 'ה'], ['ת', 'ח'], ['ה', 'ח'], ['מ', 'ט'], ['ו', 'ז'], ['ע', 'צ'],
+    ['כ', 'ק'], ['ט', 'ת'], ['ח', 'כ'], ['ו', 'ב'], ['א', 'ע'], ['ס', 'ש'], ['ו', 'י']];
   const isConf = (a, b) => CONF.some(([x, y]) => (x === a && y === b) || (x === b && y === a));
   const PRAISE = ['כָּל הַכָּבוֹד!', 'יָפֶה מְאוֹד!', 'הִתְאַמַּצְתְּ וְהִצְלַחְתְּ!', 'מְצֻיָּן!', 'אֵיזוֹ הַקְשָׁבָה!'];
   const TRY = 'כִּמְעַט! נְנַסֶּה שׁוּב?';
@@ -352,8 +488,12 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   const $ = (id) => document.getElementById(id);
 
   /* ---------------- state ---------------- */
-  const S = { screen: 'home', game: null, i: 0, total: 8, plan: [], q: null, tries: 0, locked: false, run: 0, voice: true, name: '', recent: [], lastThing: null };
-  try { S.voice = localStorage.getItem('amelia.voice') !== 'off'; S.name = localStorage.getItem('amelia.name') || ''; } catch (e) {}
+  const S = { screen: 'home', game: null, i: 0, total: 8, plan: [], q: null, tries: 0, locked: false, run: 0, voice: true, name: '', recent: [], lastThing: null, order: 'abc', lesson: null, learnedMem: [] };
+  try {
+    S.voice = localStorage.getItem('amelia.voice') !== 'off';
+    S.name = localStorage.getItem('amelia.name') || '';
+    S.order = localStorage.getItem('amelia.order') || 'abc';
+  } catch (e) {}
 
   /* ---------------- companion ---------------- */
   function buddySVG() {
@@ -384,7 +524,7 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
       <text class="zzz" x="96" y="18" font-size="18">z</text><text class="zzz" x="106" y="6" font-size="13">z</text>
     </svg>`;
   }
-  ['homeBuddy', 'gameBuddy', 'endBuddy'].forEach((id) => { $(id).innerHTML = buddySVG(); });
+  ['homeBuddy', 'gameBuddy', 'endBuddy', 'mapBuddy', 'hubBuddy'].forEach((id) => { $(id).innerHTML = buddySVG(); });
   let moodTimer = 0;
   function mood(m, back) {
     document.querySelectorAll('.buddy').forEach((b) => b.setAttribute('data-mood', m));
@@ -439,7 +579,7 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   /* ---------------- screens ---------------- */
   function show(name) {
     S.screen = name;
-    ['home', 'game', 'end'].forEach((s) => { $(s).hidden = s !== name; });
+    ['home', 'game', 'end', 'map', 'hub'].forEach((s) => { $(s).hidden = s !== name; });
   }
   function goHome() {
     S.run++; S.game = null;
@@ -456,11 +596,13 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
 
   function startGame(kind) {
     S.run++; S.game = kind; S.i = 0;
+    S.total = kind === 'writing' ? 6 : 8; // tracing takes longer, so a shorter round
     S.plan = {
       numbers: ['howMany', 'feed', 'compare', 'howMany', 'feed', 'compare', 'howMany', 'feed'],
       letters: ['findLetter', 'firstSound', 'feedWord', 'findLetter', 'firstSound', 'feedWord', 'firstSound', 'feedWord'],
       sounds: ['rhyme', 'syllables', 'sameSound', 'rhyme', 'syllables', 'sameSound', 'syllables', 'rhyme'],
-      math: ['add', 'after', 'hidden', 'add', 'after', 'hidden', 'add', 'hidden']
+      math: ['add', 'after', 'hidden', 'add', 'after', 'hidden', 'add', 'hidden'],
+      writing: Array(6).fill('trace')
     }[kind];
     show('game'); renderProgress(); ask();
   }
@@ -469,10 +611,10 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   function ask() {
     S.tries = 0; S.locked = false; mood('happy');
     $('againBtn').disabled = false;
-    $('board').innerHTML = ''; $('options').innerHTML = '';
+    $('board').innerHTML = ''; $('options').innerHTML = ''; $('options').classList.remove('single');
     const type = S.plan[S.i];
     const hard = S.i >= 3; // first questions stay small so she starts with wins
-    ({ howMany, feed, compare, findLetter, firstSound, feedWord, rhyme, syllables, sameSound, add, after, hidden })[type](hard);
+    ({ howMany, feed, compare, findLetter, firstSound, feedWord, rhyme, syllables, sameSound, add, after, hidden, trace, meet, traceA, traceB, findL, picL, shadow, bubbles, hearYes })[type](hard);
     say(S.q.prompt);
   }
   function newThing() { let t; do { t = pick(THINGS); } while (t === S.lastThing); S.lastThing = t; return t; }
@@ -550,8 +692,9 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   }
 
   // Letters
+  function quizPool() { const l = getLearned(); return l.length >= 4 ? l : STARTER; }
   function pickLetter() {
-    const keys = Object.keys(LET).filter((k) => !S.recent.includes(k));
+    const keys = quizPool().filter((k) => !S.recent.includes(k));
     const fromName = [...S.name].filter((c) => keys.includes(c));
     const L = fromName.length && Math.random() < 0.5 ? pick(fromName) : pick(keys);
     S.recent.push(L); if (S.recent.length > 3) S.recent.shift();
@@ -559,7 +702,9 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   }
   function distractors(L, k) {
     const out = [];
-    for (const c of shuffle(Object.keys(LET))) {
+    // Prefer letters she already knows, then the rest.
+    const pool = shuffle(quizPool()), rest = shuffle(Object.keys(LET).filter((c) => !pool.includes(c)));
+    for (const c of [...pool, ...rest]) {
       if (c === L || isConf(c, L) || out.some((o) => isConf(o, c))) continue;
       out.push(c); if (out.length === k) break;
     }
@@ -567,8 +712,9 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   }
   const letterBtn = (c) => `<span style="font-size:1.1em">${c}</span>`;
 
-  function findLetter() {
-    const L = pickLetter(), [w, e] = pick(LET[L].w);
+  function findLetter() { findLetterFor(pickLetter()); }
+  function findLetterFor(L) {
+    const [w, e] = pick(LET[L].w);
     S.q = { prompt: `אֵיפֹה הָאוֹת ${LET[L].n}? ${LET[L].n}, כְּמוֹ ${w}.`, ok: `נָכוֹן! זוֹ הָאוֹת ${LET[L].n}.` };
     $('board').innerHTML = `<div class="big-pic" aria-hidden="true">${e}</div>`;
     makeOptions(shuffle([L, ...distractors(L, 2)]), letterBtn, L, (c) => `זוֹ הָאוֹת ${LET[c].n}. אֲנַחְנוּ מְחַפְּשׂוֹת אֶת ${LET[L].n}.`);
@@ -579,8 +725,9 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
     $('board').innerHTML = `<div class="big-pic" aria-hidden="true">${e}</div>`;
     makeOptions(shuffle([L, ...distractors(L, 2)]), letterBtn, L, () => `כִּמְעַט! תַּקְשִׁיבִי: ${w}. נְנַסֶּה שׁוּב?`);
   }
-  function feedWord() {
-    const L = pickLetter(), right = pick(LET[L].w);
+  function feedWord() { feedWordFor(pickLetter()); }
+  function feedWordFor(L) {
+    const right = pick(LET[L].w);
     const others = distractors(L, 2).map((c) => ({ c, w: pick(LET[c].w) }));
     S.q = { prompt: `אמיליה אוֹסֶפֶת רַק דְּבָרִים שֶׁמַּתְחִילִים בָּאוֹת ${LET[L].n}. מָה נִתֵּן לָהּ?`, ok: `כֵּן! ${right[0]} מַתְחִילָה בָּאוֹת ${LET[L].n}.` };
     $('board').innerHTML = `<div class="big-letter">${L}</div>`;
@@ -695,6 +842,387 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
     makeOptions(numOptions(hid, 1, 9), (v) => v, hid, () => `כִּמְעַט! תַּמְשִׁיכִי לִסְפֹּר מִ${NUMW[shown]} עַד ${NUMW[total]}.`);
   }
 
+  /* ---------------- writing: the letter is only lines, and they fill in as she traces ---------------- */
+  // Print-letter strokes in a 100x100 box, in writing order and direction (top y=22, base y=78).
+  const STROKES = {
+    'א': [[[26, 22], [74, 78]], [[72, 22], [71, 40], [63, 61]], [[41, 40], [36, 62], [26, 78]]],
+    'ב': [[[24, 22], [64, 22], [71, 29], [71, 78]], [[80, 78], [22, 78]]],
+    'ג': [[[42, 22], [53, 24], [58, 34], [62, 78]], [[61, 62], [40, 78]]],
+    'ד': [[[22, 22], [80, 22]], [[67, 22], [67, 78]]],
+    'ה': [[[24, 22], [68, 22], [74, 28], [74, 78]], [[30, 40], [30, 78]]],
+    'ו': [[[44, 22], [54, 22], [54, 78]]],
+    'ז': [[[36, 22], [66, 22]], [[51, 22], [51, 78]]],
+    'ח': [[[28, 22], [68, 22], [74, 28], [74, 78]], [[28, 22], [28, 78]]],
+    'ט': [[[28, 24], [26, 60], [34, 73], [50, 78], [66, 73], [74, 60], [74, 32], [68, 22], [58, 26], [54, 38]]],
+    'י': [[[44, 22], [56, 22], [56, 44]]],
+    'כ': [[[24, 22], [58, 22], [70, 28], [76, 42], [76, 58], [70, 72], [58, 78], [24, 78]]],
+    'ל': [[[28, 4], [28, 34], [68, 34], [74, 40], [72, 56], [54, 78]]],
+    'מ': [[[24, 22], [30, 60], [34, 78]], [[26, 26], [44, 22], [66, 22], [74, 30], [74, 78], [54, 78]]],
+    'נ': [[[40, 22], [56, 22], [62, 28], [62, 78], [36, 78]]],
+    'ס': [[[26, 22], [62, 22], [72, 30], [76, 48], [72, 68], [58, 78], [40, 78], [28, 68], [24, 46], [26, 22]]],
+    'ע': [[[72, 22], [66, 56], [52, 72], [24, 78]], [[34, 22], [62, 58]]],
+    'פ': [[[24, 22], [58, 22], [70, 28], [76, 42], [76, 58], [70, 72], [58, 78], [24, 78]], [[36, 22], [36, 44], [50, 44]]],
+    'צ': [[[26, 22], [64, 68], [60, 78], [22, 78]], [[74, 22], [70, 40], [53, 53]]],
+    'ק': [[[24, 22], [68, 22], [74, 28], [74, 62]], [[30, 40], [30, 96]]],
+    'ר': [[[24, 22], [60, 22], [70, 28], [72, 38], [72, 78]]],
+    'ש': [[[74, 22], [74, 70], [66, 78], [34, 78], [26, 70], [26, 22]], [[50, 22], [50, 78]]],
+    'ת': [[[24, 22], [68, 22], [74, 28], [74, 78]], [[36, 22], [36, 78], [26, 78]]]
+  };
+  const LINE_W = 9;                 // line width, in letter units (letter box is 100)
+  const TOL = LINE_W * 1.5;         // how far from the line still counts
+  const EMPTY = '#DCD6EA', FILLED = '#2EC4B6', START = '#5BC46B', ARROW = '#FFFFFF';
+
+  function resample(poly) {
+    const out = [poly[0]];
+    for (let k = 1; k < poly.length; k++) {
+      const [x1, y1] = poly[k - 1], [x2, y2] = poly[k], len = Math.hypot(x2 - x1, y2 - y1), n = Math.max(1, Math.round(len));
+      for (let j = 1; j <= n; j++) out.push([x1 + (x2 - x1) * j / n, y1 + (y2 - y1) * j / n]);
+    }
+    return out;
+  }
+
+  // Builds the tracing pad on the board and calls onDone when every stroke is filled.
+  function tracePad(L, opts, onDone) {
+    const [, e] = LET[L].w[0];
+    $('board').innerHTML = `<div class="draw-wrap"><div class="pad"><canvas class="ink" data-l="${L}" aria-label="כתיבת האות ${LET[L].n}"></canvas></div><span class="draw-pic" aria-hidden="true">${e}</span></div>`;
+    const q = S.q;
+    requestAnimationFrame(() => { if (S.q === q) setup(); });
+
+    function setup() {
+      const wrap = $('board').querySelector('.draw-wrap'), pad = wrap.querySelector('.pad'), cv = pad.querySelector('canvas');
+      const s = Math.max(180, Math.floor(Math.min(wrap.clientWidth, wrap.clientHeight) - 8));
+      pad.style.width = s + 'px'; pad.style.height = s + 'px';
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      cv.width = s * dpr; cv.height = s * dpr;
+      const ctx = cv.getContext('2d');
+      // Fit this letter's lines to the pad, so every letter is drawn as big as possible.
+      const all = STROKES[L].flat();
+      const minX = Math.min(...all.map((p) => p[0])), maxX = Math.max(...all.map((p) => p[0]));
+      const minY = Math.min(...all.map((p) => p[1])), maxY = Math.max(...all.map((p) => p[1]));
+      const span = Math.max(maxX - minX, maxY - minY) + LINE_W * 2.6;
+      const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2, k = s / span;
+      ctx.scale(dpr, dpr); ctx.translate(s / 2, s / 2); ctx.scale(k, k); ctx.translate(-cx, -cy); // draw in letter units from here on
+
+      const strokes = STROKES[L].map(resample);
+      let si = 0, prog = 0, active = false, movedOn = false, fails = 0, allowAny = false, bigDot = false, done = false;
+      let lastProg = performance.now(), ghostAt = opts.demo ? performance.now() + 2600 : 0, ghostUsed = !!opts.demo, lastTone = 0;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const toUnits = (ev) => {
+        const r = cv.getBoundingClientRect(), f = s / r.width;
+        return [((ev.clientX - r.left) * f - s / 2) / k + cx, ((ev.clientY - r.top) * f - s / 2) / k + cy];
+      };
+      const near = (p, q2) => Math.hypot(p[0] - q2[0], p[1] - q2[1]) < TOL;
+
+      function advance(p) {
+        if (done) return;
+        let pts = strokes[si];
+        if (allowAny && prog === 0 && !near(p, pts[0]) && near(p, pts[pts.length - 1])) { pts.reverse(); }
+        const skip = Math.max(6, Math.round(pts.length * 0.15));
+        let best = -1;
+        for (let j = prog; j <= Math.min(pts.length - 1, prog + skip); j++) if (near(p, pts[j])) best = j;
+        if (best > prog || (best === 0 && prog === 0 && active)) {
+          if (best > prog) {
+            prog = best; movedOn = true; bigDot = false; lastProg = performance.now();
+            const now = performance.now();
+            if (now - lastTone > 120) { lastTone = now; tone(560 + 520 * (prog / pts.length), 0.07, 0, 0.06); }
+          }
+          if (prog >= (pts.length - 1) * 0.85) finishStroke();
+        }
+      }
+      function finishStroke() {
+        prog = strokes[si].length - 1;
+        popSound(); tone(990, 0.12, 0.05, 0.08);
+        si++; prog = 0; fails = 0; allowAny = false; ghostUsed = false; lastProg = performance.now();
+        if (si >= strokes.length) {
+          done = true; cv.style.cursor = 'default';
+          wrap.querySelector('.draw-pic').classList.add('won');
+          setTimeout(onDone, 350);
+        }
+      }
+      function miss() {
+        fails++;
+        if (fails === 1) { bigDot = true; say('מַתְחִילִים כָּאן, בַּנְּקֻדָּה הַיְּרֻקָּה!'); mood('think', 1500); }
+        else if (fails === 2) { ghostAt = performance.now(); ghostUsed = true; }
+        else allowAny = true; // after three tries any direction is fine, so she always succeeds
+      }
+
+      cv.addEventListener('pointerdown', (ev) => {
+        if (!ev.isPrimary || done || S.locked) return;
+        ev.preventDefault(); cv.setPointerCapture(ev.pointerId);
+        active = true; movedOn = false; advance(toUnits(ev));
+      });
+      cv.addEventListener('pointermove', (ev) => {
+        if (!ev.isPrimary || done) return;
+        // Mouse fills even while just hovering; it only starts at the green dot, so passing by paints nothing.
+        if (!active && ev.pointerType !== 'mouse') return;
+        const evs = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [];
+        (evs.length ? evs : [ev]).forEach((pe) => advance(toUnits(pe)));
+      });
+      const up = (ev) => { if (!ev.isPrimary || !active) return; active = false; if (!movedOn && !done) miss(); };
+      cv.addEventListener('pointerup', up);
+      cv.addEventListener('pointercancel', up);
+
+      const path = (pts, upto) => { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let j = 1; j <= upto; j++) ctx.lineTo(pts[j][0], pts[j][1]); ctx.stroke(); };
+      function draw(now) {
+        if (!cv.isConnected) return;
+        ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); ctx.restore();
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.lineWidth = LINE_W; ctx.strokeStyle = EMPTY;
+        strokes.forEach((pts) => path(pts, pts.length - 1));
+        ctx.strokeStyle = FILLED;
+        if (done) { ctx.shadowColor = '#FFC93C'; ctx.shadowBlur = 6 + 3 * Math.sin(now / 150); }
+        strokes.forEach((pts, j) => { if (j < si) path(pts, pts.length - 1); else if (j === si && prog > 0) path(pts, prog); });
+        ctx.shadowBlur = 0;
+        if (!done) {
+          const pts = strokes[si];
+          // Arrows flowing along the line show the writing direction.
+          if (opts.arrows) {
+            const gap = 16, off = reduce ? 0 : (now / 40) % gap;
+            ctx.fillStyle = ARROW;
+            for (let d = prog + 8 + off; d < pts.length - 4; d += gap) {
+              const a = pts[Math.floor(d)], b = pts[Math.min(pts.length - 1, Math.floor(d) + 2)];
+              const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+              ctx.save(); ctx.translate(a[0], a[1]); ctx.rotate(ang);
+              ctx.beginPath(); ctx.moveTo(2.4, 0); ctx.lineTo(-1.6, -2.4); ctx.lineTo(-1.6, 2.4); ctx.closePath(); ctx.fill();
+              ctx.restore();
+            }
+          }
+          // Pulsing green start dot (bigger after a start in the wrong place).
+          if (prog === 0) {
+            const r = LINE_W * 0.8 * (bigDot ? 1.35 : 1) * (reduce ? 1 : 1 + 0.12 * Math.sin(now / 220));
+            ctx.fillStyle = START; ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], r, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#FFFFFF'; ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], r * 0.35, 0, Math.PI * 2); ctx.fill();
+          }
+          // A ghost finger shows the way when she is stuck for a few seconds.
+          if (!ghostUsed && now - lastProg > 4000 && !active) { ghostAt = now; ghostUsed = true; }
+          if (ghostAt && now >= ghostAt) {
+            const t = (now - ghostAt) / 1500;
+            if (t > 1) ghostAt = 0;
+            else {
+              const g = pts[Math.min(pts.length - 1, Math.floor(t * (pts.length - 1)))];
+              ctx.font = '13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+              ctx.globalAlpha = 0.85; ctx.fillText('👆', g[0], g[1] - 1); ctx.globalAlpha = 1;
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      requestAnimationFrame(draw);
+    }
+  }
+
+  function writingLetter() {
+    const learned = getLearned();
+    return learned.length && Math.random() < 0.7 ? pick(learned) : pickLetter();
+  }
+  function trace() {
+    const L = writingLetter(), [w] = LET[L].w[0];
+    S.q = { prompt: `בּוֹאִי נִכְתֹּב אֶת הָאוֹת ${LET[L].n}! מַתְחִילִים בַּנְּקֻדָּה הַיְּרֻקָּה.`, ok: `כָּתַבְתְּ אֶת ${LET[L].n}, כְּמוֹ ${w}!` };
+    tracePad(L, { arrows: true }, () => success(null));
+  }
+
+  /* ---------------- letter path: one letter at a time ---------------- */
+  const ABC = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
+  // Distinct letters first; confusing pairs never come one after the other.
+  const REC = ['מ', 'ל', 'א', 'ש', 'ת', 'ר', 'ב', 'נ', 'ס', 'ד', 'ג', 'י', 'ו', 'ה', 'פ', 'ק', 'ע', 'ט', 'כ', 'צ', 'ח', 'ז'];
+  function getLearned() { try { return JSON.parse(localStorage.getItem('amelia.learned') || '[]').filter((c) => LET[c]); } catch (e) { return S.learnedMem || []; } }
+  function setLearned(list) { S.learnedMem = list; try { localStorage.setItem('amelia.learned', JSON.stringify(list)); } catch (e) {} }
+  function orderList() {
+    if (S.order !== 'rec') return ABC;
+    const name = [...new Set([...S.name].filter((c) => LET[c]))];
+    return [...name, ...REC.filter((c) => !name.includes(c))];
+  }
+  const STONE_COLORS = [['--sun', '--sun-dk'], ['--pink', '--pink-dk'], ['--go', '--go-dk'], ['--sky', '--sky-dk'], ['--grape', '--grape-dk']];
+
+  function openMap(justLearned) {
+    S.run++; S.game = null;
+    show('map'); mood('happy');
+    renderMap(justLearned);
+    const learned = getLearned(), next = orderList().find((c) => !learned.includes(c));
+    const text = next ? `בַּחֲרִי אוֹת! הָאוֹת הַבָּאָה הִיא ${LET[next].n}.` : 'לָמַדְתְּ אֶת כָּל הָאוֹתִיּוֹת! אֶפְשָׁר לַחֲזֹר עַל כָּל אוֹת.';
+    say(text, $('mapBubble'));
+    $('reviewBtn').hidden = learned.length < 4;
+  }
+  function renderMap(justLearned) {
+    const grid = $('mapGrid'), list = orderList(), learned = getLearned();
+    const next = list.find((c) => !learned.includes(c));
+    const cols = grid.clientWidth < 560 ? 4 : 6;
+    grid.style.setProperty('--cols', cols);
+    grid.innerHTML = '<svg class="map-path" aria-hidden="true"></svg>' + list.map((c, i) => {
+      const row = Math.floor(i / cols), inRow = i % cols, col = row % 2 === 0 ? inRow + 1 : cols - inRow;
+      const state = learned.includes(c) ? 'learned' : c === next ? 'next' : 'todo';
+      const [cc, cd] = STONE_COLORS[i % STONE_COLORS.length];
+      return `<button type="button" class="stone ${state}${c === justLearned ? ' just' : ''}" data-l="${c}" style="grid-row:${row + 1};grid-column:${col};--sc:var(${cc});--scd:var(${cd})" aria-label="האות ${LET[c].n}${state === 'learned' ? ', נלמדה' : ''}">${c}${state === 'learned' ? `<span class="stone-star">${STAR}</span>` : ''}</button>`;
+    }).join('');
+    grid.querySelectorAll('.stone').forEach((b) => b.addEventListener('click', () => openHub(b.dataset.l)));
+    // Dotted trail through the stones, in path order.
+    requestAnimationFrame(() => {
+      const svg = grid.querySelector('.map-path'), gr = grid.getBoundingClientRect();
+      svg.setAttribute('viewBox', `0 0 ${gr.width} ${gr.height}`);
+      const pts = [...grid.querySelectorAll('.stone')].map((b) => { const r = b.getBoundingClientRect(); return `${r.left - gr.left + r.width / 2},${r.top - gr.top + r.height / 2}`; });
+      svg.innerHTML = `<polyline points="${pts.join(' ')}" fill="none" stroke="#C9BDF2" stroke-width="6" stroke-dasharray="2 12" stroke-linecap="round" stroke-linejoin="round"/>`;
+    });
+  }
+
+  function startLesson(L) {
+    S.run++; S.game = 'lesson'; S.lesson = L; S.i = 0; S.total = 5;
+    S.plan = ['meet', 'traceA', 'traceB', 'findL', 'picL'];
+    show('game'); renderProgress(); ask();
+  }
+  function meet() {
+    const L = S.lesson, [w, e] = LET[L].w[0], n = LET[L].n;
+    S.q = { prompt: `זֹאת הָאוֹת ${n}. ${n} כְּמוֹ ${w}!`, ok: '' };
+    $('board').innerHTML = `<div class="meet"><button type="button" class="big-letter meet-letter" aria-label="${n}">${L}</button><div class="big-pic" aria-hidden="true">${e}</div></div>`;
+    $('board').querySelector('.meet-letter').addEventListener('click', () => say(S.q.prompt));
+    const box = $('options'); box.classList.add('single');
+    box.innerHTML = `<button type="button" class="opt press go-next" style="--c: var(--go); --cd: var(--go-dk)" aria-label="ממשיכים">
+      <svg viewBox="0 0 48 48"><path d="M30 10 16 24l14 14" fill="none" stroke="#203047" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+    box.querySelector('.go-next').addEventListener('click', () => { if (S.locked) return; S.locked = true; S.i++; renderProgress(); ask(); });
+  }
+  function lessonTrace(first) {
+    const L = S.lesson, [w] = LET[L].w[0], n = LET[L].n;
+    S.q = {
+      prompt: first ? `עַכְשָׁו נִכְתֹּב אֶת ${n}. מַתְחִילִים בַּנְּקֻדָּה הַיְּרֻקָּה וְהוֹלְכִים עִם הַחִצִּים.` : 'עוֹד פַּעַם! הַפַּעַם בְּלִי חִצִּים.',
+      ok: first ? `כָּתַבְתְּ ${n}! ${n} כְּמוֹ ${w}.` : `שׁוּב כָּתַבְתְּ ${n}!`
+    };
+    tracePad(L, { arrows: first, demo: first }, () => success(null));
+  }
+  const traceA = () => lessonTrace(true);
+  const traceB = () => lessonTrace(false);
+  const findL = () => findLetterFor(S.lesson);
+  const picL = () => feedWordFor(S.lesson);
+
+  /* ---------------- letter hub: she picks what to do with each letter ---------------- */
+  const TASKS = [
+    { id: 'draw', icon: '✏️', label: 'מְצַיְּרִים', say: 'לְצַיֵּר', c: ['--grape', '--grape-dk'], plan: ['traceA', 'traceB'], done: (n) => `כָּתַבְתְּ אֶת ${n} יָפֶה!` },
+    { id: 'shape', icon: '🔍', label: 'מְזַהִים צוּרָה', say: 'לְזַהוֹת', c: ['--sky', '--sky-dk'], plan: ['shadow', 'bubbles', 'findL'], done: (n) => `מָצָאת אֶת ${n} בְּכָל מָקוֹם!` },
+    { id: 'hear', icon: '👂', label: 'מַקְשִׁיבִים', say: 'לְהַקְשִׁיב', c: ['--go', '--go-dk'], plan: ['hearYes', 'hearYes', 'hearYes'], done: (n) => `שָׁמַעַתְּ אֶת ${n} בַּמִּלִּים!` },
+    { id: 'pics', icon: '🖼️', label: 'תְּמוּנוֹת', say: 'תְּמוּנוֹת', c: ['--pink', '--pink-dk'], plan: ['picL', 'picL', 'picL'], done: (n) => `מָצָאת תְּמוּנוֹת שֶׁל ${n}!` }
+  ];
+  const CHECK = '<span class="done-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  function getTasks() { try { return JSON.parse(localStorage.getItem('amelia.tasks') || '{}'); } catch (e) { return S.tasksMem || {}; } }
+  function taskDone(L, id) {
+    const all = getTasks(); all[L] = [...new Set([...(all[L] || []), id])];
+    S.tasksMem = all; try { localStorage.setItem('amelia.tasks', JSON.stringify(all)); } catch (e) {}
+    return all[L];
+  }
+
+  function openHub(L) {
+    S.run++; S.game = null; S.lesson = L;
+    show('hub'); mood('happy');
+    const n = LET[L].n, done = getTasks()[L] || [];
+    $('hubLetter').textContent = L;
+    $('hubTiles').innerHTML = TASKS.map((t) => `<button type="button" class="choice press" data-task="${t.id}" style="--c: var(${t.c[0]}); --cd: var(${t.c[1]})" aria-label="${t.label}">
+        ${done.includes(t.id) ? CHECK : ''}<span class="choice-art" aria-hidden="true">${t.icon}</span><span class="choice-label">${t.label}</span></button>`).join('') +
+      `<button type="button" class="choice press wide" data-task="all" style="--c: var(--sun); --cd: var(--sun-dk)" aria-label="שיעור שלם">
+        ${getLearned().includes(L) ? CHECK : ''}<span class="choice-art" aria-hidden="true">⭐</span><span class="choice-label">שִׁעוּר שָׁלֵם</span></button>`;
+    $('hubTiles').querySelectorAll('.choice').forEach((b) => b.addEventListener('click', () => {
+      const id = b.dataset.task;
+      if (id === 'all') startLesson(L); else startTask(L, TASKS.find((t) => t.id === id));
+    }));
+    say(`מָה נַעֲשֶׂה עִם הָאוֹת ${n}? ${TASKS.map((t) => t.say).join(', ').replace(/, ([^,]*)$/, ' אוֹ $1')}?`, $('hubBubble'));
+  }
+  function startTask(L, task) {
+    S.run++; S.game = 'task'; S.task = task; S.lesson = L; S.i = 0; S.hadYes = false;
+    S.plan = task.plan; S.total = task.plan.length;
+    show('game'); renderProgress(); ask();
+  }
+  function showEndHub(L) { $('endHub').hidden = false; $('endHub').textContent = L; }
+  function finishTask() {
+    const L = S.lesson, n = LET[L].n, task = S.task;
+    const done = taskDone(L, task.id);
+    const learned = getLearned();
+    const nowLearned = !learned.includes(L) && TASKS.every((t) => done.includes(t.id));
+    if (nowLearned) setLearned([...learned, L]);
+    show('end'); mood('party');
+    $('endStars').innerHTML = Array.from({ length: S.total }, () => `<span class="on">${STAR}</span>`).join('');
+    $('endStars').querySelectorAll('.st').forEach((p) => { p.setAttribute('fill', 'var(--sun)'); p.setAttribute('stroke', 'var(--sun-dk)'); p.classList.remove('st'); });
+    $('endMap').hidden = false; showEndHub(L);
+    const who = S.name ? `, ${S.name}` : '';
+    const text = `כָּל הַכָּבוֹד${who}! ${task.done(n)}` + (nowLearned ? ` עָשִׂית הַכֹּל, וְלָמַדְתְּ אֶת הָאוֹת ${n}!` : '');
+    say(text, $('endBubble'));
+    burst($('endStars'));
+  }
+
+  // Shape: which letter fits this shadow?
+  function shadow() {
+    const L = S.lesson, n = LET[L].n;
+    S.q = { prompt: 'אֵיזוֹ אוֹת מַתְאִימָה לַצֵּל הַזֶּה?', ok: `נָכוֹן! זֶה הַצֵּל שֶׁל ${n}.` };
+    $('board').innerHTML = `<div class="shadow-letter" aria-hidden="true">${L}</div>`;
+    makeOptions(shuffle([L, ...distractors(L, 2)]), letterBtn, L, (c) => `זוֹ ${LET[c].n}. תִּסְתַּכְּלִי עַל הַצּוּרָה שֶׁל הַצֵּל.`);
+  }
+
+  // Shape: pop every bubble that has the letter.
+  function bubbles() {
+    const L = S.lesson, n = LET[L].n, others = distractors(L, 3);
+    const cells = shuffle([L, L, L, ...others, ...others]);
+    const tints = ['#CFF3EE', '#FFE7A8', '#FFD3E6', '#D9CCFF', '#CDEBFF'];
+    S.q = { prompt: `פּוֹצְצִי אֶת כָּל הַבּוּעוֹת שֶׁל ${n}! יֵשׁ שָׁלוֹשׁ.`, ok: `פּוֹצַצְתְּ אֶת כָּל הַבּוּעוֹת שֶׁל ${n}!` };
+    $('board').innerHTML = `<div class="target-chip" aria-hidden="true">${L}</div><div class="bubbles">` + cells.map((c, k) =>
+      `<button type="button" class="bub" data-c="${c}" style="--bc:${tints[k % tints.length]};--d:${(k % 4) * 0.4}s" aria-label="${LET[c].n}">${c}</button>`).join('') + '</div>';
+    let found = 0, misses = 0;
+    $('board').querySelectorAll('.bub').forEach((b) => b.addEventListener('click', () => {
+      if (S.locked || b.classList.contains('popped')) return;
+      if (b.dataset.c === L) {
+        found++; b.classList.add('popped'); tone(700 + found * 120, 0.12); popSound();
+        say(NUMW[found], false);
+        if (found === 3) { S.locked = true; setTimeout(() => success(null), 500); }
+      } else {
+        misses++;
+        b.classList.remove('wobble'); void b.offsetWidth; b.classList.add('wobble');
+        mood('think', 1500);
+        say(`זוֹ ${LET[b.dataset.c].n}. מְחַפְּשִׂים אֶת ${n}.`);
+        if (misses >= 2) $('board').querySelectorAll(`.bub[data-c="${L}"]:not(.popped)`).forEach((x) => x.classList.add('hint'));
+      }
+    }));
+  }
+
+  // Listening: does the word start with the letter? Thumbs up or down.
+  function hearYes() {
+    const L = S.lesson, n = LET[L].n;
+    const yes = (S.i === S.total - 1 && !S.hadYes) || Math.random() < 0.5;
+    if (yes) S.hadYes = true;
+    const w = yes ? pick(LET[L].w) : pick(LET[distractors(L, 1)[0]].w);
+    S.q = {
+      prompt: `${w[0]}. הַאִם ${w[0]} מַתְחִילָה בָּאוֹת ${n}?`,
+      ok: yes ? `כֵּן! ${w[0]} מַתְחִילָה בָּאוֹת ${n}.` : `נָכוֹן! ${w[0]} לֹא מַתְחִילָה בָּאוֹת ${n}.`
+    };
+    $('board').innerHTML = `<div class="target-chip" aria-hidden="true">${L}</div><div class="big-pic" aria-hidden="true">${w[1]}</div>`;
+    makeOptions(['yes', 'no'], (v) => (v === 'yes' ? '👍' : '👎'), yes ? 'yes' : 'no', () => `תַּקְשִׁיבִי שׁוּב: ${w[0]}... ${n}...`, 'thumb');
+    const [y, no] = $('options').querySelectorAll('.opt');
+    y.style.setProperty('--c', 'var(--go)'); y.style.setProperty('--cd', 'var(--go-dk)'); y.setAttribute('aria-label', 'כן');
+    no.style.setProperty('--c', 'var(--pink)'); no.style.setProperty('--cd', 'var(--pink-dk)'); no.setAttribute('aria-label', 'לא');
+  }
+
+  function lessonsToday() {
+    const day = new Date().toDateString();
+    try {
+      const d = JSON.parse(localStorage.getItem('amelia.day') || '{}');
+      return d.day === day ? d.n : 0;
+    } catch (e) { return 0; }
+  }
+  function countLesson() {
+    const day = new Date().toDateString(), n = lessonsToday() + 1;
+    try { localStorage.setItem('amelia.day', JSON.stringify({ day, n })); } catch (e) {}
+    return n;
+  }
+  function finishLesson() {
+    const L = S.lesson, [w] = LET[L].w[0], n = LET[L].n;
+    const learned = getLearned(); if (!learned.includes(L)) setLearned([...learned, L]);
+    const today = countLesson();
+    show('end'); mood('party');
+    $('endStars').innerHTML = `<div class="sticker" style="--sc: var(--grape)">${L}</div>`;
+    $('endMap').hidden = false; showEndHub(L);
+    const who = S.name ? `, ${S.name}` : '';
+    const tired = today >= 2;
+    const text = `כָּל הַכָּבוֹד${who}! לָמַדְתְּ אֶת הָאוֹת ${n}. ${n} כְּמוֹ ${w}!` + (tired ? ' אמיליה עֲיֵפָה. נִתְרָאֶה מָחָר!' : '');
+    say(text, $('endBubble'));
+    burst($('endStars'));
+    const run = S.run;
+    if (tired) setTimeout(() => { if (S.run === run) mood('sleep'); }, 3600);
+  }
+
   /* ---------------- answers ---------------- */
   function choose(btn, ok, wrongMsg) {
     if (S.locked) return;
@@ -736,11 +1264,14 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
     }
   }
   function finish() {
+    if (S.game === 'lesson') return finishLesson();
+    if (S.game === 'task') return finishTask();
+    $('endMap').hidden = true; $('endHub').hidden = true;
     show('end'); mood('party');
     $('endStars').innerHTML = Array.from({ length: S.total }, (_, k) => `<span class="on" style="animation-delay:${k * 0.12}s">${STAR}</span>`).join('');
     $('endStars').querySelectorAll('svg').forEach((s, k) => { s.style.animationDelay = k * 0.12 + 's'; s.querySelector('.st').setAttribute('fill', 'var(--sun)'); s.querySelector('.st').setAttribute('stroke', 'var(--sun-dk)'); s.querySelector('.st').classList.remove('st'); });
     const who = S.name ? `, ${S.name}` : '';
-    const text = `כָּל הַכָּבוֹד${who}! אָסַפְתְּ שְׁמוֹנֶה כּוֹכָבִים. אמיליה עֲיֵפָה וְהוֹלֶכֶת לָנוּחַ. נִתְרָאֶה מָחָר!`;
+    const text = `כָּל הַכָּבוֹד${who}! אָסַפְתְּ ${S.total === 6 ? 'שִׁשָּׁה' : 'שְׁמוֹנָה'} כּוֹכָבִים. אמיליה עֲיֵפָה וְהוֹלֶכֶת לָנוּחַ. נִתְרָאֶה מָחָר!`;
     say(text, $('endBubble'));
     const run = S.run;
     setTimeout(() => { if (S.run === run) mood('sleep'); }, 3200);
@@ -761,6 +1292,8 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   function openSettings() {
     loadVoices();
     $('childName').value = S.name; $('voiceOn').checked = S.voice;
+    $('orderRec').checked = S.order === 'rec'; $('orderAbc').checked = S.order !== 'rec';
+    $('resetProgress').textContent = `איפוס התקדמות (${getLearned().length} אותיות נלמדו)`;
     $('voiceStatus').textContent = !window.speechSynthesis
       ? 'הדפדפן הזה לא תומך בהקראה. המשחק יעבוד, אבל בלי קול.'
       : heVoice ? `נמצא קול בעברית: ${heVoice.name}.`
@@ -772,9 +1305,24 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
 
   /* ---------------- events ---------------- */
   document.addEventListener('pointerdown', (e) => { if (e.target.closest('button.press, .choice')) popSound(); });
-  document.querySelectorAll('.choice').forEach((b) => b.addEventListener('click', () => startGame(b.dataset.game)));
+  document.querySelectorAll('.choice').forEach((b) => b.addEventListener('click', () => (b.dataset.game === 'letters' ? openMap() : startGame(b.dataset.game))));
   $('homeBtn').addEventListener('click', goHome);
   $('endHome').addEventListener('click', goHome);
+  $('mapHome').addEventListener('click', goHome);
+  $('endMap').addEventListener('click', () => openMap(S.lesson));
+  $('endHub').addEventListener('click', () => openHub(S.lesson));
+  $('hubHome').addEventListener('click', goHome);
+  $('hubMap').addEventListener('click', () => openMap());
+  $('hubBubble').addEventListener('click', () => say($('hubBubble').textContent, $('hubBubble')));
+  $('reviewBtn').addEventListener('click', () => startGame('letters'));
+  $('mapBubble').addEventListener('click', () => say($('mapBubble').textContent, $('mapBubble')));
+  let resizeT = 0;
+  window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (S.screen === 'map') renderMap(); }, 200); });
+  let resetArmed = false;
+  $('resetProgress').addEventListener('click', () => {
+    if (!resetArmed) { resetArmed = true; $('resetProgress').textContent = 'בטוחים? לחצו שוב כדי למחוק'; return; }
+    setLearned([]); resetArmed = false; $('resetProgress').textContent = 'ההתקדמות נמחקה';
+  });
   $('againBtn').addEventListener('click', () => { if (!S.locked && S.q) say(S.q.prompt); });
   $('bubble').addEventListener('click', () => { if (!S.locked && S.q) say(S.q.prompt); });
   const homeHello = () => { mood('party', 1200); say(S.name ? `שָׁלוֹם ${S.name}! אֲנִי אמיליה. מָה נְשַׂחֵק הַיּוֹם? מִסְפָּרִים אוֹ אוֹתִיּוֹת?` : 'שָׁלוֹם! אֲנִי אמיליה. מָה נְשַׂחֵק הַיּוֹם? מִסְפָּרִים אוֹ אוֹתִיּוֹת?', $('homeBubble')); };
@@ -784,8 +1332,10 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   $('gateClose').addEventListener('click', closeGate);
   $('settingsClose').addEventListener('click', () => {
     S.name = $('childName').value.trim(); S.voice = $('voiceOn').checked;
-    try { localStorage.setItem('amelia.name', S.name); localStorage.setItem('amelia.voice', S.voice ? 'on' : 'off'); } catch (e) {}
+    S.order = $('orderRec').checked ? 'rec' : 'abc';
+    try { localStorage.setItem('amelia.name', S.name); localStorage.setItem('amelia.voice', S.voice ? 'on' : 'off'); localStorage.setItem('amelia.order', S.order); } catch (e) {}
     closeGate();
+    if (S.screen === 'map') openMap();
     if (S.screen === 'home') $('homeBubble').textContent = S.name ? `שָׁלוֹם ${S.name}! אֲנִי אמיליה. מָה נְשַׂחֵק הַיּוֹם?` : 'שָׁלוֹם! אֲנִי אמיליה. מָה נְשַׂחֵק הַיּוֹם?';
   });
 
