@@ -169,6 +169,32 @@ button.big-pic { background: none; cursor: pointer; }
 .bub.wobble { animation: wobble .5s ease-in-out; }
 .bub.hint { box-shadow: 0 0 0 8px var(--sun), 0 5px 0 #DCE7EC; }
 .opt.thumb { font-size: clamp(54px, 13vw, 80px); }
+
+/* drawing ladder */
+.ladder { display: flex; gap: 8px; align-items: center; }
+.rung {
+  position: relative; width: clamp(46px, 12vw, 72px); height: clamp(46px, 12vw, 72px); border-radius: 50%; display: grid; place-items: center;
+  background: #FFFFFF; box-shadow: 0 4px 0 #D5E3EA; font-size: clamp(22px, 5.6vw, 34px); transition: transform .2s;
+}
+.rung svg { width: 62%; height: 62%; }
+.rung.now { transform: scale(1.2); box-shadow: 0 0 0 4px var(--sun), 0 4px 0 #D5E3EA; z-index: 1; }
+.rung.later { opacity: .4; }
+.rung.wobble { animation: wobble .5s ease-in-out; }
+.rung-star { position: absolute; top: -8px; left: -8px; width: 24px; animation: pop .4s cubic-bezier(.3, 1.7, .5, 1); }
+.rung-star .st { fill: var(--sun); stroke: var(--sun-dk); }
+.tile-dots { display: flex; gap: 6px; }
+.tile-dots i { width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 255, 255, .45); }
+.tile-dots i.on { background: #FFFFFF; box-shadow: 0 0 0 2px var(--sun); }
+.pad.free { background: #FFFDF7; cursor: crosshair; }
+.pad.free canvas { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 26px; touch-action: none; }
+.options.pair { grid-template-columns: repeat(2, minmax(0, 200px)); justify-content: space-between; }
+.opt.sponge { font-size: 46px; min-height: 84px; }
+.opt.done-btn { min-height: 96px; animation: invite 1.6s ease-in-out infinite; }
+.opt.done-btn svg { width: 56px; height: 56px; }
+.compare { display: flex; gap: 6%; justify-content: center; width: 100%; }
+.cmp-card { width: 40%; aspect-ratio: 1; border-radius: 24px; background: #FFFFFF; box-shadow: 0 0 0 5px var(--sun), 0 6px 0 5px var(--sun-dk); display: grid; place-items: center; overflow: hidden; animation: pop .5s cubic-bezier(.3, 1.7, .5, 1); }
+.cmp-card img { width: 100%; height: 100%; }
+.cmp-letter { font-family: var(--display); font-weight: 700; font-size: clamp(80px, 22vw, 140px); color: var(--ink); }
 @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 @keyframes popOut { 0% { transform: scale(1); opacity: 1; } 60% { transform: scale(1.35); opacity: .6; } 100% { transform: scale(1.6); opacity: 0; visibility: hidden; } }
 .meet { display: flex; align-items: center; justify-content: center; gap: clamp(16px, 6vw, 48px); flex-wrap: wrap; }
@@ -591,6 +617,7 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
 
   const STAR = '<svg viewBox="0 0 24 24"><path class="st" d="M12 2.6l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.5l-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9z" stroke-linejoin="round"/></svg>';
   function renderProgress() {
+    if (isLadder()) return renderLadder();
     $('progress').innerHTML = Array.from({ length: S.total }, (_, k) => `<span class="${k < S.i ? 'on' : ''}">${STAR}</span>`).join('');
   }
 
@@ -611,10 +638,10 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   function ask() {
     S.tries = 0; S.locked = false; mood('happy');
     $('againBtn').disabled = false;
-    $('board').innerHTML = ''; $('options').innerHTML = ''; $('options').classList.remove('single');
+    $('board').innerHTML = ''; $('options').innerHTML = ''; $('options').classList.remove('single', 'pair');
     const type = S.plan[S.i];
     const hard = S.i >= 3; // first questions stay small so she starts with wins
-    ({ howMany, feed, compare, findLetter, firstSound, feedWord, rhyme, syllables, sameSound, add, after, hidden, trace, meet, traceA, traceB, findL, picL, shadow, bubbles, hearYes })[type](hard);
+    ({ howMany, feed, compare, findLetter, firstSound, feedWord, rhyme, syllables, sameSound, add, after, hidden, trace, meet, traceA, traceB, findL, picL, shadow, bubbles, hearYes, step1, step2, step3, step4 })[type](hard);
     say(S.q.prompt);
   }
   function newThing() { let t; do { t = pick(THINGS); } while (t === S.lastThing); S.lastThing = t; return t; }
@@ -964,12 +991,33 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
       cv.addEventListener('pointercancel', up);
 
       const path = (pts, upto) => { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let j = 1; j <= upto; j++) ctx.lineTo(pts[j][0], pts[j][1]); ctx.stroke(); };
+      function starAt(x, y, r) {
+        ctx.fillStyle = '#FFC93C'; ctx.strokeStyle = '#DFA400'; ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * 0.45 : r; ctx.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a)); }
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.lineWidth = LINE_W;
+      }
       function draw(now) {
         if (!cv.isConnected) return;
         ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); ctx.restore();
         ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         ctx.lineWidth = LINE_W; ctx.strokeStyle = EMPTY;
-        strokes.forEach((pts) => path(pts, pts.length - 1));
+        // Step 1: full lines. Step 2: faded lines. Step 3: no lines, only start and end dots.
+        if (!opts.dots) {
+          ctx.globalAlpha = opts.faint ? 0.35 : 1;
+          strokes.forEach((pts) => path(pts, pts.length - 1));
+          ctx.globalAlpha = 1;
+        } else if (!done) {
+          strokes.forEach((pts, j) => {
+            if (j < si) return;
+            ctx.globalAlpha = j === si ? 1 : 0.35;
+            const e = pts[pts.length - 1];
+            starAt(e[0], e[1], LINE_W * 0.62);
+            if (j > si) { ctx.fillStyle = START; ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], LINE_W * 0.7, 0, Math.PI * 2); ctx.fill(); }
+            ctx.globalAlpha = 1;
+          });
+        }
         ctx.strokeStyle = FILLED;
         if (done) { ctx.shadowColor = '#FFC93C'; ctx.shadowBlur = 6 + 3 * Math.sin(now / 150); }
         strokes.forEach((pts, j) => { if (j < si) path(pts, pts.length - 1); else if (j === si && prog > 0) path(pts, prog); });
@@ -1095,7 +1143,7 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
 
   /* ---------------- letter hub: she picks what to do with each letter ---------------- */
   const TASKS = [
-    { id: 'draw', icon: '✏️', label: 'מְצַיְּרִים', say: 'לְצַיֵּר', c: ['--grape', '--grape-dk'], plan: ['traceA', 'traceB'], done: (n) => `כָּתַבְתְּ אֶת ${n} יָפֶה!` },
+    { id: 'draw', icon: '✏️', label: 'מְצַיְּרִים', say: 'לְצַיֵּר', c: ['--grape', '--grape-dk'], plan: ['step1', 'step2', 'step3', 'step4'], done: (n) => `צִיַּרְתְּ אֶת ${n} לְבַד!` },
     { id: 'shape', icon: '🔍', label: 'מְזַהִים צוּרָה', say: 'לְזַהוֹת', c: ['--sky', '--sky-dk'], plan: ['shadow', 'bubbles', 'findL'], done: (n) => `מָצָאת אֶת ${n} בְּכָל מָקוֹם!` },
     { id: 'hear', icon: '👂', label: 'מַקְשִׁיבִים', say: 'לְהַקְשִׁיב', c: ['--go', '--go-dk'], plan: ['hearYes', 'hearYes', 'hearYes'], done: (n) => `שָׁמַעַתְּ אֶת ${n} בַּמִּלִּים!` },
     { id: 'pics', icon: '🖼️', label: 'תְּמוּנוֹת', say: 'תְּמוּנוֹת', c: ['--pink', '--pink-dk'], plan: ['picL', 'picL', 'picL'], done: (n) => `מָצָאת תְּמוּנוֹת שֶׁל ${n}!` }
@@ -1114,7 +1162,7 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
     const n = LET[L].n, done = getTasks()[L] || [];
     $('hubLetter').textContent = L;
     $('hubTiles').innerHTML = TASKS.map((t) => `<button type="button" class="choice press" data-task="${t.id}" style="--c: var(${t.c[0]}); --cd: var(${t.c[1]})" aria-label="${t.label}">
-        ${done.includes(t.id) ? CHECK : ''}<span class="choice-art" aria-hidden="true">${t.icon}</span><span class="choice-label">${t.label}</span></button>`).join('') +
+        ${done.includes(t.id) ? CHECK : ''}<span class="choice-art" aria-hidden="true">${t.icon}</span><span class="choice-label">${t.label}</span>${t.id === 'draw' ? `<span class="tile-dots" aria-label="שלב ${getLadder()[L] || 0} מתוך 4">${[0, 1, 2, 3].map((k) => `<i class="${k < (getLadder()[L] || 0) ? 'on' : ''}"></i>`).join('')}</span>` : ''}</button>`).join('') +
       `<button type="button" class="choice press wide" data-task="all" style="--c: var(--sun); --cd: var(--sun-dk)" aria-label="שיעור שלם">
         ${getLearned().includes(L) ? CHECK : ''}<span class="choice-art" aria-hidden="true">⭐</span><span class="choice-label">שִׁעוּר שָׁלֵם</span></button>`;
     $('hubTiles').querySelectorAll('.choice').forEach((b) => b.addEventListener('click', () => {
@@ -1124,8 +1172,13 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
     say(`מָה נַעֲשֶׂה עִם הָאוֹת ${n}? ${TASKS.map((t) => t.say).join(', ').replace(/, ([^,]*)$/, ' אוֹ $1')}?`, $('hubBubble'));
   }
   function startTask(L, task) {
-    S.run++; S.game = 'task'; S.task = task; S.lesson = L; S.i = 0; S.hadYes = false;
+    S.run++; S.game = 'task'; S.task = task; S.lesson = L; S.i = 0; S.hadYes = false; S.freeFails = 0;
     S.plan = task.plan; S.total = task.plan.length;
+    if (task.id === 'draw') {
+      // Start from the highest step she reached last time (after finishing, from "by myself").
+      const reached = getLadder()[L] || 0;
+      S.i = Math.min(reached, 3); S.resumeNote = reached > 0;
+    }
     show('game'); renderProgress(); ask();
   }
   function showEndHub(L) { $('endHub').hidden = false; $('endHub').textContent = L; }
@@ -1221,6 +1274,156 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
     burst($('endStars'));
     const run = S.run;
     if (tired) setTimeout(() => { if (S.run === run) mood('sleep'); }, 3600);
+  }
+
+  /* ---------------- drawing ladder: from full help to drawing alone ---------------- */
+  const LADDER_ICONS = [
+    '<span aria-hidden="true">👆</span>',
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18C9 6 15 6 19 18" fill="none" stroke="#B9AEDD" stroke-width="3.4" stroke-linecap="round" opacity=".55"/></svg>',
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="3.4" fill="#7BD84B"/><circle cx="10" cy="12" r="1" fill="#9AA6B8"/><circle cx="14" cy="12" r="1" fill="#9AA6B8"/><path d="M19 8.2l1.1 2.3 2.5.3-1.8 1.7.5 2.5-2.3-1.2-2.3 1.2.5-2.5-1.8-1.7 2.5-.3z" fill="#FFC93C"/></svg>',
+    '<span aria-hidden="true">🖍️</span>'
+  ];
+  const LADDER_NAMES = ['עִם עֶזְרָה', 'קַוִּים חִוְּרִים', 'רַק נְקֻדּוֹת', 'לְבַד'];
+  function getLadder() { try { return JSON.parse(localStorage.getItem('amelia.ladder') || '{}'); } catch (e) { return S.ladderMem || {}; } }
+  function saveLadder(L, step) {
+    const all = getLadder(); all[L] = Math.max(all[L] || 0, step);
+    S.ladderMem = all; try { localStorage.setItem('amelia.ladder', JSON.stringify(all)); } catch (e) {}
+  }
+  const isLadder = () => S.game === 'task' && S.task && S.task.id === 'draw';
+  function renderLadder() {
+    const reached = getLadder()[S.lesson] || 0;
+    $('progress').innerHTML = '<div class="ladder">' + LADDER_ICONS.map((ic, k) => {
+      const state = k === S.i ? 'now' : k < S.i || k < reached ? 'done' : 'later';
+      return `<button type="button" class="rung ${state}" data-k="${k}" aria-label="שלב ${k + 1}: ${LADDER_NAMES[k]}">${ic}${state === 'done' ? `<span class="rung-star">${STAR}</span>` : ''}</button>`;
+    }).join('') + '</div>';
+    $('progress').querySelectorAll('.rung-star .st').forEach((st) => { st.setAttribute('fill', '#FFC93C'); st.setAttribute('stroke', '#DFA400'); st.classList.remove('st'); });
+    $('progress').querySelectorAll('.rung').forEach((b) => b.addEventListener('click', () => {
+      const k = +b.dataset.k;
+      if (k === S.i || S.locked) return;
+      if (b.classList.contains('later')) { b.classList.remove('wobble'); void b.offsetWidth; b.classList.add('wobble'); say('קֹדֶם נְסַיֵּם אֶת זֶה.'); return; }
+      S.i = k; S.freeFails = 0; renderProgress(); ask();
+    }));
+  }
+  function ladderStep(k) {
+    const L = S.lesson, n = LET[L].n, [w] = LET[L].w[0];
+    const resume = S.resumeNote ? 'נַמְשִׁיךְ מִכָּאן! ' : ''; S.resumeNote = false;
+    const prompts = [
+      `${resume}נִכְתֹּב אֶת ${n} עִם עֶזְרָה. מַתְחִילִים בַּנְּקֻדָּה הַיְּרֻקָּה וְהוֹלְכִים עִם הַחִצִּים.`,
+      `${resume}עַכְשָׁו הַקַּוִּים חִוְּרִים. כִּתְבִי אֶת ${n} עֲלֵיהֶם.`,
+      `${resume}עַכְשָׁו רַק נְקֻדּוֹת! מִתְחִילִים בַּנְּקֻדָּה הַיְּרֻקָּה וּמַגִּיעִים לַכּוֹכָב.`
+    ];
+    S.q = { prompt: prompts[k], ok: [`כָּתַבְתְּ ${n}! ${n} כְּמוֹ ${w}.`, 'יָפֶה! כִּמְעַט בְּלִי עֶזְרָה.', 'מְחַבַּרְתְּ אֶת כָּל הַנְּקֻדּוֹת!'][k] };
+    const first = k === 0 && !(getLadder()[L] > 0);
+    tracePad(L, [{ arrows: true, demo: first }, { faint: true }, { dots: true }][k], () => { saveLadder(L, k + 1); success(null); });
+  }
+  const step1 = () => ladderStep(0), step2 = () => ladderStep(1), step3 = () => ladderStep(2);
+
+  // Step 4: an empty notebook pad. She draws, then taps the green button to check.
+  function step4() {
+    const L = S.lesson, n = LET[L].n;
+    const resume = S.resumeNote ? 'נַמְשִׁיךְ מִכָּאן! ' : ''; S.resumeNote = false;
+    S.q = { prompt: `${resume}עַכְשָׁו אַתְּ לְבַד! צַיְּרִי אֶת ${n} בֵּין הַקַּוִּים, וּבַסּוֹף לַחֲצִי עַל הַכַּפְתּוֹר הַיָּרֹק.`, ok: 'וַאוּ! צִיַּרְתְּ בְּעַצְמֵךְ!' };
+    $('board').innerHTML = `<div class="draw-wrap"><div class="pad free"><canvas class="free-ink" data-l="${L}" aria-label="ציור חופשי של האות ${n}"></canvas></div></div>`;
+    const box = $('options'); box.classList.add('pair');
+    box.innerHTML = `<button type="button" class="opt press sponge" style="--c: #FFFFFF; --cd: var(--pink)" aria-label="למחוק">🧽</button>
+      <button type="button" class="opt press done-btn" style="--c: var(--go); --cd: var(--go-dk)" aria-label="סיימתי" hidden>
+        <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+    const q = S.q;
+    requestAnimationFrame(() => { if (S.q === q) setupFree(L); });
+  }
+  function setupFree(L) {
+    const wrap = $('board').querySelector('.draw-wrap'), pad = wrap.querySelector('.pad'), cv = pad.querySelector('canvas');
+    const s = Math.max(200, Math.floor(Math.min(wrap.clientWidth, wrap.clientHeight) - 8));
+    pad.style.width = s + 'px'; pad.style.height = s + 'px';
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = s * dpr; cv.height = s * dpr;
+    const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+    const lines = []; let cur = null;
+    const doneBtn = $('options').querySelector('.done-btn'), sponge = $('options').querySelector('.sponge');
+
+    function paint(faded) {
+      ctx.clearRect(0, 0, s, s);
+      // Notebook guide lines: dashed top line, solid base line.
+      ctx.setLineDash([12, 10]); ctx.lineWidth = 3; ctx.strokeStyle = '#6CC4FF';
+      ctx.beginPath(); ctx.moveTo(s * 0.06, s * 0.2); ctx.lineTo(s * 0.94, s * 0.2); ctx.stroke();
+      ctx.setLineDash([]); ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(32,48,71,.3)';
+      ctx.beginPath(); ctx.moveTo(s * 0.06, s * 0.8); ctx.lineTo(s * 0.94, s * 0.8); ctx.stroke();
+      ctx.globalAlpha = faded ? 0.4 : 1;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = s * 0.07; ctx.strokeStyle = '#2EC4B6';
+      lines.forEach((ln) => { ctx.beginPath(); ln.forEach(([x, y], j) => (j ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); if (ln.length === 1) ctx.lineTo(ln[0][0] + 0.1, ln[0][1]); ctx.stroke(); });
+      ctx.globalAlpha = 1;
+    }
+    paint(false);
+    const pos = (ev) => { const r = cv.getBoundingClientRect(); return [(ev.clientX - r.left) * s / r.width, (ev.clientY - r.top) * s / r.height]; };
+    cv.addEventListener('pointerdown', (ev) => {
+      if (!ev.isPrimary || S.locked) return;
+      ev.preventDefault(); cv.setPointerCapture(ev.pointerId);
+      cur = [pos(ev)]; lines.push(cur); paint(false);
+    });
+    cv.addEventListener('pointermove', (ev) => {
+      if (!cur || !ev.isPrimary) return;
+      const evs = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [];
+      (evs.length ? evs : [ev]).forEach((pe) => cur.push(pos(pe)));
+      paint(false);
+    });
+    const up = (ev) => { if (!ev.isPrimary || !cur) return; cur = null; if (lines.length) doneBtn.hidden = false; };
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    sponge.addEventListener('click', () => { if (S.locked) return; lines.length = 0; doneBtn.hidden = true; paint(false); });
+
+    doneBtn.addEventListener('click', () => {
+      if (S.locked || !lines.length) return;
+      if (matchesLetter(L, lines, s)) {
+        S.locked = true;
+        const img = cv.toDataURL('image/png');
+        $('board').innerHTML = `<div class="compare"><div class="cmp-card"><img src="${img}" alt="הציור שלה"></div><div class="cmp-card cmp-letter">${L}</div></div>`;
+        $('options').innerHTML = '';
+        saveLadder(L, 4);
+        success(null);
+        return;
+      }
+      S.freeFails = (S.freeFails || 0) + 1;
+      S.locked = true; mood('think', 2200);
+      paint(true);
+      // Show the right letter faintly over her drawing for two seconds, then clear the pad.
+      ctx.save(); ctx.globalAlpha = 0.55; ctx.strokeStyle = '#A07BFF'; ctx.lineWidth = s * 0.05; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      const k = s * 0.6 / 56;
+      STROKES[L].forEach((poly) => { ctx.beginPath(); poly.forEach(([u, v], j) => { const x = s / 2 + (u - 50) * k, y = s * 0.2 + (v - 22) * k; j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke(); });
+      ctx.restore();
+      if (S.freeFails >= 2) {
+        say('בּוֹאִי נִתְאַמֵּן רֶגַע עִם נְקֻדּוֹת, וְאָז נְנַסֶּה שׁוּב לְבַד!');
+        const run = S.run;
+        setTimeout(() => { if (S.run !== run) return; S.freeFails = 0; S.i = 2; renderProgress(); ask(); }, 2600);
+      } else {
+        say('כִּמְעַט! בּוֹאִי נִסְתַּכֵּל יַחַד עַל הָאוֹת, וּנְצַיֵּר שׁוּב.');
+        setTimeout(() => { if (!cv.isConnected) return; lines.length = 0; doneBtn.hidden = true; paint(false); S.locked = false; mood('happy'); }, 2400);
+      }
+    });
+  }
+
+  // Compares a free drawing with the letter's strokes, ignoring where and how big it was drawn.
+  function matchesLetter(L, lines, s, tune) {
+    const T = Object.assign({ cover: 7, prec: 8, minCover: 0.8, minPrec: 0.85, maxDist: 0.45 }, tune);
+    const tpl = STROKES[L].map(resample).flat();
+    const pts = [];
+    lines.forEach((ln) => { for (let j = 0; j < ln.length; j++) { if (j && Math.hypot(ln[j][0] - ln[j - 1][0], ln[j][1] - ln[j - 1][1]) > s * 0.02) { const st = Math.ceil(Math.hypot(ln[j][0] - ln[j - 1][0], ln[j][1] - ln[j - 1][1]) / (s * 0.01)); for (let t = 1; t < st; t++) pts.push([ln[j - 1][0] + (ln[j][0] - ln[j - 1][0]) * t / st, ln[j - 1][1] + (ln[j][1] - ln[j - 1][1]) * t / st]); } pts.push(ln[j]); } });
+    const box = (a) => { const xs = a.map((p) => p[0]), ys = a.map((p) => p[1]); return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) }; };
+    const tb = box(tpl), ub = box(pts);
+    const tW = tb.x1 - tb.x0, tH = tb.y1 - tb.y0, uW = ub.x1 - ub.x0, uH = ub.y1 - ub.y0;
+    if (Math.max(uW, uH) < s * 0.15) return false;                    // too small to be a letter
+    const thin = tW < 22;                                              // ו and י are narrow
+    if (thin ? uW / Math.max(uH, 1) > 0.75 : (uW / Math.max(uH, 1)) / (tW / tH) < 0.45 || (uW / Math.max(uH, 1)) / (tW / tH) > 2.2) return false;
+    const sy = tH / Math.max(uH, 1), sx = thin || T.uniform ? sy : tW / Math.max(uW, 1);
+    const ucx = (ub.x0 + ub.x1) / 2, tcx = (tb.x0 + tb.x1) / 2;
+    const mapped = pts.filter((_, j) => j % 2 === 0).map(([x, y]) => [tcx + (x - ucx) * sx, tb.y0 + (y - ub.y0) * sy]);
+    const near = (p, set, tol) => set.some((q) => Math.abs(p[0] - q[0]) < tol && Math.abs(p[1] - q[1]) < tol && Math.hypot(p[0] - q[0], p[1] - q[1]) < tol);
+    const covered = tpl.filter((p) => near(p, mapped, T.cover)).length / tpl.length;
+    const precise = mapped.filter((p) => near(p, tpl, T.prec)).length / mapped.length;
+    if (covered < T.minCover || precise < T.minPrec) return false;
+    // Also compare how the ink is spread over a 4x4 grid (catches an open side or a foot in the wrong place).
+    const hist = (a) => { const h = Array(16).fill(0); a.forEach(([x, y]) => { const cx2 = thin ? 0 : Math.min(3, Math.max(0, Math.floor((x - tb.x0) / Math.max(tW, 1) * 4))), cy2 = Math.min(3, Math.max(0, Math.floor((y - tb.y0) / Math.max(tH, 1) * 4))); h[cy2 * 4 + cx2]++; }); return h.map((v) => v / a.length); };
+    const ht = hist(tpl), hu = hist(mapped);
+    const dist = ht.reduce((sum, v, j) => sum + Math.abs(v - hu[j]), 0);
+    return dist <= T.maxDist;
   }
 
   /* ---------------- answers ---------------- */
