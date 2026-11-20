@@ -1322,7 +1322,7 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   function step4() {
     const L = S.lesson, n = LET[L].n;
     const resume = S.resumeNote ? 'נַמְשִׁיךְ מִכָּאן! ' : ''; S.resumeNote = false;
-    S.q = { prompt: `${resume}עַכְשָׁו אַתְּ לְבַד! צַיְּרִי אֶת ${n} בֵּין הַקַּוִּים, וּבַסּוֹף לַחֲצִי עַל הַכַּפְתּוֹר הַיָּרֹק.`, ok: 'וַאוּ! צִיַּרְתְּ בְּעַצְמֵךְ!' };
+    S.q = { prompt: `${resume}עַכְשָׁו אַתְּ לְבַד! צַיְּרִי אֶת ${n} אֵיפֹה שֶׁתִּרְצִי בַּדַּף, וּבַסּוֹף לַחֲצִי עַל הַכַּפְתּוֹר הַיָּרֹק.`, ok: 'וַאוּ! צִיַּרְתְּ בְּעַצְמֵךְ!' };
     $('board').innerHTML = `<div class="draw-wrap"><div class="pad free"><canvas class="free-ink" data-l="${L}" aria-label="ציור חופשי של האות ${n}"></canvas></div></div>`;
     const box = $('options'); box.classList.add('pair');
     box.innerHTML = `<button type="button" class="opt press sponge" style="--c: #FFFFFF; --cd: var(--pink)" aria-label="למחוק">🧽</button>
@@ -1343,11 +1343,7 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
 
     function paint(faded) {
       ctx.clearRect(0, 0, s, s);
-      // Notebook guide lines: dashed top line, solid base line.
-      ctx.setLineDash([12, 10]); ctx.lineWidth = 3; ctx.strokeStyle = '#6CC4FF';
-      ctx.beginPath(); ctx.moveTo(s * 0.06, s * 0.2); ctx.lineTo(s * 0.94, s * 0.2); ctx.stroke();
-      ctx.setLineDash([]); ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(32,48,71,.3)';
-      ctx.beginPath(); ctx.moveTo(s * 0.06, s * 0.8); ctx.lineTo(s * 0.94, s * 0.8); ctx.stroke();
+      // No guide lines: she can draw the letter anywhere on the pad, at any size.
       ctx.globalAlpha = faded ? 0.4 : 1;
       ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = s * 0.07; ctx.strokeStyle = '#2EC4B6';
       lines.forEach((ln) => { ctx.beginPath(); ln.forEach(([x, y], j) => (j ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); if (ln.length === 1) ctx.lineTo(ln[0][0] + 0.1, ln[0][1]); ctx.stroke(); });
@@ -1386,8 +1382,13 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
       paint(true);
       // Show the right letter faintly over her drawing for two seconds, then clear the pad.
       ctx.save(); ctx.globalAlpha = 0.55; ctx.strokeStyle = '#A07BFF'; ctx.lineWidth = s * 0.05; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      const k = s * 0.6 / 56;
-      STROKES[L].forEach((poly) => { ctx.beginPath(); poly.forEach(([u, v], j) => { const x = s / 2 + (u - 50) * k, y = s * 0.2 + (v - 22) * k; j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke(); });
+      // Fit the hint to where and how big she drew, so it sits right on top of her drawing.
+      const ink = lines.flat(), tpl = STROKES[L].flat();
+      const bx = (a, i) => [Math.min(...a.map((p) => p[i])), Math.max(...a.map((p) => p[i]))];
+      const [ux0, ux1] = bx(ink, 0), [uy0, uy1] = bx(ink, 1), [tx0, tx1] = bx(tpl, 0), [ty0, ty1] = bx(tpl, 1);
+      const k = Math.max(s * 0.3, uy1 - uy0) / (ty1 - ty0);
+      const ox = (ux0 + ux1) / 2 - (tx0 + tx1) / 2 * k, oy = (uy0 + uy1) / 2 - (ty0 + ty1) / 2 * k;
+      STROKES[L].forEach((poly) => { ctx.beginPath(); poly.forEach(([u, v], j) => { const x = ox + u * k, y = oy + v * k; j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke(); });
       ctx.restore();
       if (S.freeFails >= 2) {
         say('בּוֹאִי נִתְאַמֵּן רֶגַע עִם נְקֻדּוֹת, וְאָז נְנַסֶּה שׁוּב לְבַד!');
@@ -1404,23 +1405,44 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
   function matchesLetter(L, lines, s, tune) {
     const T = Object.assign({ cover: 7, prec: 8, minCover: 0.8, minPrec: 0.85, maxDist: 0.45 }, tune);
     const tpl = STROKES[L].map(resample).flat();
-    const pts = [];
-    lines.forEach((ln) => { for (let j = 0; j < ln.length; j++) { if (j && Math.hypot(ln[j][0] - ln[j - 1][0], ln[j][1] - ln[j - 1][1]) > s * 0.02) { const st = Math.ceil(Math.hypot(ln[j][0] - ln[j - 1][0], ln[j][1] - ln[j - 1][1]) / (s * 0.01)); for (let t = 1; t < st; t++) pts.push([ln[j - 1][0] + (ln[j][0] - ln[j - 1][0]) * t / st, ln[j - 1][1] + (ln[j][1] - ln[j - 1][1]) * t / st]); } pts.push(ln[j]); } });
+    const pts = lines.flat();
     const box = (a) => { const xs = a.map((p) => p[0]), ys = a.map((p) => p[1]); return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) }; };
     const tb = box(tpl), ub = box(pts);
     const tW = tb.x1 - tb.x0, tH = tb.y1 - tb.y0, uW = ub.x1 - ub.x0, uH = ub.y1 - ub.y0;
-    if (Math.max(uW, uH) < s * 0.15) return false;                    // too small to be a letter
+    if (Math.max(uW, uH) < s * 0.1) return false;                     // too small to be a letter
     const thin = tW < 22;                                              // ו and י are narrow
     if (thin ? uW / Math.max(uH, 1) > 0.75 : (uW / Math.max(uH, 1)) / (tW / tH) < 0.45 || (uW / Math.max(uH, 1)) / (tW / tH) > 2.2) return false;
     const sy = tH / Math.max(uH, 1), sx = thin || T.uniform ? sy : tW / Math.max(uW, 1);
     const ucx = (ub.x0 + ub.x1) / 2, tcx = (tb.x0 + tb.x1) / 2;
-    const mapped = pts.filter((_, j) => j % 2 === 0).map(([x, y]) => [tcx + (x - ucx) * sx, tb.y0 + (y - ub.y0) * sy]);
+    // Map her lines into letter units, then space the points evenly (every 1 unit, like the letter's own lines),
+    // so a small or a quick drawing is judged the same as a big, slow one.
+    const evenly = (poly) => {
+      const out = [poly[0]]; let carry = 0;
+      for (let j = 1; j < poly.length; j++) {
+        const [x1, y1] = poly[j - 1], [x2, y2] = poly[j], len = Math.hypot(x2 - x1, y2 - y1);
+        let d = 1 - carry;
+        while (d <= len) { out.push([x1 + (x2 - x1) * d / len, y1 + (y2 - y1) * d / len]); d += 1; }
+        carry = len - (d - 1);
+      }
+      return out;
+    };
+    const mapped = lines.map((ln) => evenly(ln.map(([x, y]) => [tcx + (x - ucx) * sx, tb.y0 + (y - ub.y0) * sy]))).flat();
     const near = (p, set, tol) => set.some((q) => Math.abs(p[0] - q[0]) < tol && Math.abs(p[1] - q[1]) < tol && Math.hypot(p[0] - q[0], p[1] - q[1]) < tol);
     const covered = tpl.filter((p) => near(p, mapped, T.cover)).length / tpl.length;
     const precise = mapped.filter((p) => near(p, tpl, T.prec)).length / mapped.length;
     if (covered < T.minCover || precise < T.minPrec) return false;
     // Also compare how the ink is spread over a 4x4 grid (catches an open side or a foot in the wrong place).
-    const hist = (a) => { const h = Array(16).fill(0); a.forEach(([x, y]) => { const cx2 = thin ? 0 : Math.min(3, Math.max(0, Math.floor((x - tb.x0) / Math.max(tW, 1) * 4))), cy2 = Math.min(3, Math.max(0, Math.floor((y - tb.y0) / Math.max(tH, 1) * 4))); h[cy2 * 4 + cx2]++; }); return h.map((v) => v / a.length); };
+    // Soft binning: each point is shared between the two nearest cells on each axis, so a line lying
+    // right on a cell border does not jump from one cell to the other with a tiny wobble.
+    const share = (f) => { const c = Math.min(3, Math.max(0, f - 0.5)), i = Math.min(2, Math.floor(c)), w = c - i; return [[i, 1 - w], [i + 1, w]]; };
+    const hist = (a) => {
+      const h = Array(16).fill(0);
+      a.forEach(([x, y]) => {
+        const xs = thin ? [[0, 1]] : share((x - tb.x0) / Math.max(tW, 1) * 4), ys = share((y - tb.y0) / Math.max(tH, 1) * 4);
+        xs.forEach(([cx2, wx]) => ys.forEach(([cy2, wy]) => { h[cy2 * 4 + cx2] += wx * wy; }));
+      });
+      return h.map((v) => v / a.length);
+    };
     const ht = hist(tpl), hu = hist(mapped);
     const dist = ht.reduce((sum, v, j) => sum + Math.abs(v - hu[j]), 0);
     return dist <= T.maxDist;
