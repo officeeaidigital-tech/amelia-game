@@ -1509,7 +1509,16 @@ button.item:active { transform: translateY(4px); box-shadow: 0 1px 0 #DCE7EC; }
 
 <script>
 if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
-  navigator.serviceWorker.register("sw.js").catch(function () {});
+  // Always check for a new version: on open, and whenever the app comes back to the screen.
+  var hadController = !!navigator.serviceWorker.controller, reloaded = false;
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then(function (reg) {
+    reg.update();
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") reg.update(); });
+  }).catch(function () {});
+  // When a new version takes over, reload once so the new game shows right away.
+  navigator.serviceWorker.addEventListener("controllerchange", function () {
+    if (hadController && !reloaded) { reloaded = true; location.reload(); }
+  });
 }
 </script>
 </body>
